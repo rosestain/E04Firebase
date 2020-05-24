@@ -44,16 +44,7 @@ public class Firebase1Activity extends AppCompatActivity {
         myData01.addValueEventListener(listener1);
 
         Button button = (Button)findViewById(R.id.btnSaveIntoServer);
-        View.OnClickListener listener2 = new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                EditText editText = (EditText)findViewById(R.id.editText);
-                String s = editText.getText().toString();
-                myData01.setValue(s);
-            }
-        };
-        button.setOnClickListener(listener2);
+        final EditText editText = (EditText)findViewById(R.id.editText);
+        button.setOnClickListener((view) -> myData01.setValue(editText.getText().toString()));
     }
 }
