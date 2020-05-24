@@ -1,4 +1,4 @@
-package com.example.e04firebase;
+package net.skhu.e04firebase;
 
 import org.junit.Test;
 
