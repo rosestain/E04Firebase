@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.view.View;
 
-import com.example.e04firebase.R;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -18,7 +16,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void button_clicked(View view)
     {
-        Intent intent = new Intent(this, Firebase1Activity.class);
+        Class classObj = null;
+        switch(view.getId())
+        {
+            case R.id.button1:
+                classObj = Firebase1Activity.class;
+                break;
+
+            case R.id.button2:
+                classObj = MemoList1Activity.class;
+                break;
+        }
+        Intent intent = new Intent(this, classObj);
         startActivity(intent);
+
     }
 }
