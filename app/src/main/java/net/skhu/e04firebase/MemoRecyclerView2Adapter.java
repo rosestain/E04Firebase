@@ -9,7 +9,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +27,7 @@ import java.util.ListIterator;
 
 public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerView2Adapter.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+            implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, View.OnLongClickListener {
         TextView textView1, textView2;
         CheckBox checkBox;
 
@@ -35,6 +37,7 @@ public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerV
             textView2 = view.findViewById(R.id.textView2);
             checkBox = view.findViewById(R.id.checkBox);
             view.setOnClickListener(this);
+            view.setOnLongClickListener(this);
             checkBox.setOnCheckedChangeListener(this);
 
         }
@@ -44,6 +47,7 @@ public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerV
             textView1.setText(memo.getTitle());
             textView2.setText(memo.getDateFormatted());
             checkBox.setChecked(memo.isChecked());
+            checkBox.setVisibility(showCheckbox ? View.VISIBLE : View.GONE);
         }
 
         @Override
@@ -61,6 +65,16 @@ public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerV
             if(isChecked) ++checkedCount;
             else --checkedCount;
             onCheckCountChangeListener.onCheckCountChanged(checkedCount);
+        }
+
+        @Override
+        public boolean onLongClick(View v)
+        {
+            arrayList.get(super.getAdapterPosition()).setChecked(true);
+            showCheckbox = true;
+            backPressedCallback.setEnabled(true);
+            notifyDataSetChanged();
+            return true;
         }
 
     }
@@ -83,6 +97,17 @@ public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerV
         }
     };
 
+    OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(false) {
+        @Override
+        public void handleOnBackPressed() {
+            this.setEnabled(false);
+            showCheckbox = false;
+            for(Memo memo : arrayList)
+                memo.setChecked(false);
+            notifyDataSetChanged();
+        }
+    };
+
     LayoutInflater layoutInflater;
     ArrayList<Memo> arrayList;
     int checkedCount = 0;
@@ -90,6 +115,7 @@ public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerV
     OnMemoClickListener onMemoClickListener;
     OnCheckCountChangeListener onCheckCountChangeListener;
     DatabaseReference myData02;
+    boolean showCheckbox = false;
 
     public MemoRecyclerView2Adapter(Context context, OnMemoClickListener onMemoClickListener,
                                     OnCheckCountChangeListener onCheckCountChangeListener) {
@@ -99,6 +125,7 @@ public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerV
         this.onCheckCountChangeListener = onCheckCountChangeListener;
         this.myData02 = FirebaseDatabase.getInstance().getReference("myData02");
         this.myData02.addValueEventListener(firebaseListener);
+        ((AppCompatActivity)context).getOnBackPressedDispatcher().addCallback(backPressedCallback);
     }
 
     @Override
@@ -139,6 +166,7 @@ public class MemoRecyclerView2Adapter extends RecyclerView.Adapter<MemoRecyclerV
             }
         }
         onCheckCountChangeListener.onCheckCountChanged(checkedCount = 0);
+        showCheckbox = false;
         myData02.setValue(arrayList);
 
     }
