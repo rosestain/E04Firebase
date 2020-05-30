@@ -65,6 +65,11 @@ public class MainActivity extends AppCompatActivity {
         MenuItem menuItem_logout = menu.findItem(R.id.action_logout);
         menuItem_login.setVisible(currentUser == null);
         menuItem_logout.setVisible(currentUser != null);
+        if(currentUser != null)
+        {
+            String s = currentUser.getDisplayName() + " " + menuItem_logout.getTitle().toString();
+            menuItem_logout.setTitle(s);
+        }
         return true;
     }
 
